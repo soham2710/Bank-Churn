@@ -1,0 +1,79 @@
+pip install pyforest
+
+import pyforest
+import warnings
+warnings.filterwarnings('ignore')
+
+df = pd.read_csv('/content/Bank_churn_modelling.csv')
+df
+
+df.info()
+
+df.describe(include = 'all').T
+
+df=df.drop(['RowNumber', 'CustomerId', 'Surname'],axis=1)
+
+cat=["Geography","Gender","HasCrCard","IsActiveMember","Exited"]
+con=['CreditScore',"Tenure","Balance",'NumOfProducts',"EstimatedSalary","Age"]
+for i in cat:
+    sns.countplot(x=i,data=df)
+    plt.show()
+
+for i in con:
+    sns.distplot(df[i])
+    plt.show()
+
+sns.countplot(x="Gender",hue="Exited",data=df)
+plt.show()
+
+sns.barplot(x="Geography",y="Exited",data=df)
+plt.show()
+
+sns.distplot(df["CreditScore"][df["Exited"]==1],color='r')
+sns.distplot(df["CreditScore"][df["Exited"]==0],color='g')
+plt.show()
+
+df.info()
+
+# logistic regression
+x = df.iloc[:,0:10].values
+y = df.iloc[:,10].values
+print(x)
+print(y)
+
+x.shape
+
+y.shape
+
+from sklearn.preprocessing import LabelEncoder,OneHotEncoder
+labelencoder = LabelEncoder()
+x[:,1]=labelencoder.fit_transform(x[:,1])
+labelencoder2 = LabelEncoder()
+x[:,2]=labelencoder2.fit_transform(x[:,2])
+onehotencoder = OneHotEncoder()
+x = onehotencoder.fit_transform(x).toarray()
+x = x[:,1:]
+
+pip install sklearn
+
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2,train_size=0.8,random_state=42)
+X=X.reshape(-1,1)
+
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+x_train = sc.fit_transform(X_train)
+x_test = sc.transform(X_test)
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, confusion_matrix
+model= LogisticRegression()
+print(model.fit(X_train,y_train))
+y_pred=model.predict(X_test)
+print('Accuracy: ',metrics.accuracy_score(y_test, y_pred))
+plt.show()
+
+from sklearn.metrics import confusion_matrix, accuracy_score, classification_report
+
+print(classification_report(y_test, y_pred))
+print(confusion_matrix(y_test, y_pred))
+print('accuracy score :' ,accuracy_score(y_test, y_pred))
